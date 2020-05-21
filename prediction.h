@@ -11,6 +11,7 @@
 
 class FeatureGenerator {
 public:
+    static torch::Tensor convertCvmatToTensor(cvMat, int batch_size);
     FeatureGenerator(std::string paramPath);
 
     std::string paramPath = "";

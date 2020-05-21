@@ -49,3 +49,10 @@ int FeatureGenerator::initModel() {
     return 0;
 }
 
+/*input shape should be BxHxWxC RGB format*/
+torch::Tensor FeatureGenerator::convertCvmatToTensor(cvMat, int batch_size) {
+    at::Tensor tensor = torch::from_blob(cvMat.data, {batch_size, 224, 224, 3});
+    tensor = tensor.permute({0, 3, 1, 2});
+    return tensor
+}
+
