@@ -1,9 +1,19 @@
 //#include <torch/script.h>
-//#include <torch/torch.h>
+#include <torch/torch.h>
+
+#include <utility>
 //#include <iostream>
 //#include <memory>
 #include "prediction.h"
 #include "transform.h"
+
+torch::Tensor trans(cv::Mat img) {
+    auto resized_img = Transform::Resize(std::move(img), 256);
+    auto cropped_img = Transform::CenterCrop(resized_img, 224);
+//    auto tensor_img = Transform::ToTensor(cropped_img, 1);
+    auto tensor_img = Transform::ToTensor(cropped_img);
+    return tensor_img;
+}
 
 int main(int argc, const char *argv[]) {
     if (argc != 2) {
@@ -20,8 +30,17 @@ int main(int argc, const char *argv[]) {
     std::cout << fp.capacity() << '\n';
 
     auto img = cv::imread("/media/piston/data/Data/refer-frames/309269600/00024.jpg");
-    auto resized_img = Transform::Resize(img, 256, img.cols, img.rows);
-    auto cropped_img = Transform::CenterCrop(resized_img, 224, resized_img.cols, resized_img.rows);
+    auto trans_img = trans(img);
+    auto cp_img = trans_img.clone();
+    std::cout << trans_img.sizes() << 'n';
+    std::vector<at::Tensor> stc;
+    stc.push_back(trans_img);
+    stc.push_back(cp_img);
 
+    auto sk_img = torch::stack(stc);
+    std::cout << sk_img.sizes() << 'n';
+
+//    torch::data::transforms::Stack
+//    torch::data::datasets::StreamDataset
     return 0;
 }

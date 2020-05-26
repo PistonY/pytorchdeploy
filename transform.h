@@ -12,22 +12,31 @@ namespace Transform {
         return roi_img;
     }
 
-    /*input shape should be BxHxWxC RGB format*/
     torch::Tensor ToTensor(const cv::Mat &img, int batch_size) {
-        at::Tensor tensor = torch::from_blob(img.data, {batch_size, 224, 224, 3});
-        tensor = tensor.permute({0, 3, 1, 2});
+        cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
+        at::Tensor tensor = torch::from_blob(img.data, {batch_size, img.rows, img.cols, 3});
+        tensor = tensor.permute({0, 3, 1, 2}) / 255.;
         return tensor;
     }
 
-    cv::Mat CenterCrop(const cv::Mat &img, int size, int w, int h) {
+    torch::Tensor ToTensor(const cv::Mat &img) {
+        cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
+        at::Tensor tensor = torch::from_blob(img.data, {img.rows, img.cols, 3});
+        tensor = tensor.permute({2, 0, 1}) / 255.;
+        return tensor;
+    }
+
+    cv::Mat CenterCrop(const cv::Mat &img, int size) {
         int th = size, tw = size;
+        int w = img.cols, h = img.rows;
         int i = (h - th) / 2;
         int j = (w - tw) / 2;
         auto roi_img = Crop(img, cv::Rect(j, i, tw, th));
         return roi_img;
     }
 
-    cv::Mat Resize(cv::Mat img, int size, int w, int h) {
+    cv::Mat Resize(cv::Mat img, int size) {
+        int w = img.cols, h = img.rows;
         if ((w <= h and w == size) or (h <= w and h == size)) {
             return img;
         } else {
