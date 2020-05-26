@@ -21,9 +21,9 @@ namespace Transform {
 
     cv::Mat CenterCrop(const cv::Mat &img, int size, int w, int h) {
         int th = size, tw = size;
-        int i = int((h - th) / 2.);
-        int j = int((w - tw) / 2.);
-        auto roi_img = Crop(img, cv::Rect(i, j, th, tw));
+        int i = (h - th) / 2;
+        int j = (w - tw) / 2;
+        auto roi_img = Crop(img, cv::Rect(j, i, tw, th));
         return roi_img;
     }
 

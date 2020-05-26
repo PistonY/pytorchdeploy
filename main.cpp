@@ -19,5 +19,9 @@ int main(int argc, const char *argv[]) {
     auto bp = fg->batchPredict(inp);
     std::cout << fp.capacity() << '\n';
 
+    auto img = cv::imread("/media/piston/data/Data/refer-frames/309269600/00024.jpg");
+    auto resized_img = Transform::Resize(img, 256, img.cols, img.rows);
+    auto cropped_img = Transform::CenterCrop(resized_img, 224, resized_img.cols, resized_img.rows);
+
     return 0;
 }
