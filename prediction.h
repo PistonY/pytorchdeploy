@@ -2,6 +2,7 @@
 // Created by piston on 2020/5/21.
 //
 #include <iostream>
+#include <opencv2/opencv.hpp>
 #include <torch/script.h>
 
 #ifndef STUDY_PREDICTION_H
@@ -11,14 +12,14 @@
 
 class FeatureGenerator {
 public:
-    static torch::Tensor convertCvmatToTensor(cvMat, int batch_size);
-    FeatureGenerator(std::string paramPath);
 
     std::string paramPath = "";
 
-    std::vector<float> flattenPredict(torch::Tensor batchOutput);
+    explicit FeatureGenerator(std::string paramPath);
 
-    std::vector<std::vector<float>> batchPredict(torch::Tensor batchOutput);
+    std::vector<float> flattenPredict(const torch::Tensor& batchOutput);
+
+    std::vector<std::vector<float>> batchPredict(const torch::Tensor& batchOutput);
 
     int initModel();
 
@@ -27,5 +28,5 @@ public:
 private:
     torch::jit::script::Module model;
 
-    torch::Tensor predict(torch::Tensor input);
+    torch::Tensor predict(const torch::Tensor& input);
 };

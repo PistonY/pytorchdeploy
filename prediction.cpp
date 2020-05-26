@@ -4,39 +4,37 @@
 
 #include "prediction.h"
 
-std::vector<float> FeatureGenerator::flattenPredict(torch::Tensor batchInput) {
+std::vector<float> FeatureGenerator::flattenPredict(const torch::Tensor& batchInput) {
     auto batchOutput = this->predict(batchInput);
     std::vector<float> flattenFeats(
             batchOutput.data_ptr<float>(), batchOutput.data_ptr<float>() + batchOutput.numel());
     return flattenFeats;
 }
 
-std::vector<std::vector<float>> FeatureGenerator::batchPredict(torch::Tensor batchInput) {
+std::vector<std::vector<float>> FeatureGenerator::batchPredict(const torch::Tensor& batchInput) {
     auto batchOutput = this->predict(batchInput);
     std::vector<std::vector<float>> batchFeats;
     for (int i = 0; i < batchOutput.size(0); ++i) {
         auto tar_tensor = batchOutput.index({i, "..."});
-        batchFeats.push_back(
-                std::vector<float>(tar_tensor.data_ptr<float>(), tar_tensor.data_ptr<float>() + tar_tensor.numel())
+        batchFeats.emplace_back(tar_tensor.data_ptr<float>(), tar_tensor.data_ptr<float>() + tar_tensor.numel()
         );
     }
     return batchFeats;
 }
 
-torch::Tensor FeatureGenerator::predict(torch::Tensor input) {
+torch::Tensor FeatureGenerator::predict(const torch::Tensor& input) {
     std::vector<torch::jit::IValue> inputs;
-    inputs.push_back(input.cuda());
+    inputs.emplace_back(input.cuda());
     at::Tensor output = model.forward(inputs).toTensor().to(torch::kCPU, true);
     return output;
 }
 
 FeatureGenerator::FeatureGenerator(std::string paramPath) {
-    this->paramPath = paramPath;
+    this->paramPath = std::move(paramPath);
 }
 
 
-FeatureGenerator::~FeatureGenerator() {
-}
+FeatureGenerator::~FeatureGenerator() = default;
 
 int FeatureGenerator::initModel() {
     try {
@@ -47,12 +45,5 @@ int FeatureGenerator::initModel() {
         return -1;
     }
     return 0;
-}
-
-/*input shape should be BxHxWxC RGB format*/
-torch::Tensor FeatureGenerator::convertCvmatToTensor(cvMat, int batch_size) {
-    at::Tensor tensor = torch::from_blob(cvMat.data, {batch_size, 224, 224, 3});
-    tensor = tensor.permute({0, 3, 1, 2});
-    return tensor
 }
 
