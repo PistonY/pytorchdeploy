@@ -7,10 +7,9 @@
 #include "prediction.h"
 #include "transform.h"
 
-torch::Tensor trans(cv::Mat img) {
-    auto resized_img = Transform::Resize(std::move(img), 256);
-    auto cropped_img = Transform::CenterCrop(resized_img, 224);
-//    auto tensor_img = Transform::ToTensor(cropped_img, 1);
+torch::Tensor trans(cv::Mat img, int size = 224, float ratio = 0.875) {
+    auto resized_img = Transform::Resize(std::move(img), int(float(size) / ratio));
+    auto cropped_img = Transform::CenterCrop(resized_img, size);
     auto tensor_img = Transform::ToTensor(cropped_img);
     return tensor_img;
 }
