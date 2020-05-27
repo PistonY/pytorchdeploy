@@ -52,4 +52,11 @@ namespace Transform {
             return img;
         }
     }
+
+    torch::Tensor transOneImage(cv::Mat img, int size = 224, float ratio = 0.875) {
+        auto resized_img = Resize(std::move(img), int(float(size) / ratio));
+        auto cropped_img = CenterCrop(resized_img, size);
+        auto tensor_img = ToTensor(cropped_img);
+        return tensor_img;
+    }
 };

@@ -1,35 +1,24 @@
-//#include <torch/script.h>
 #include <torch/torch.h>
-
-#include <utility>
-//#include <iostream>
-//#include <memory>
 #include "prediction.h"
 #include "transform.h"
-
-torch::Tensor trans(cv::Mat img, int size = 224, float ratio = 0.875) {
-    auto resized_img = Transform::Resize(std::move(img), int(float(size) / ratio));
-    auto cropped_img = Transform::CenterCrop(resized_img, size);
-    auto tensor_img = Transform::ToTensor(cropped_img);
-    return tensor_img;
-}
 
 int main(int argc, const char *argv[]) {
     if (argc != 2) {
         std::cerr << "usage: example-app <path-to-exported-script-module>\n";
         return -1;
     }
-
+//    Init model.
     auto *fg = new FeatureGenerator(argv[1]);
     int status = fg->initModel();
     std::cout << status << '\n';
     auto inp = torch::randn({2, 3, 224, 224});
-    std::vector<float> fp = fg->flattenPredict(inp);
+    auto fp = fg->flattenPredict(inp);
     auto bp = fg->batchPredict(inp);
     std::cout << fp.capacity() << '\n';
 
+// process images and stack to one tensor
     auto img = cv::imread("/media/piston/data/Data/refer-frames/309269600/00024.jpg");
-    auto trans_img = trans(img);
+    auto trans_img = Transform::transOneImage(img);
     auto cp_img = trans_img.clone();
     std::cout << trans_img.sizes() << 'n';
     std::vector<at::Tensor> stc;
