@@ -12,17 +12,11 @@ namespace Transform {
         return roi_img;
     }
 
-    torch::Tensor ToTensor(const cv::Mat &img, int batch_size) {
+    torch::Tensor ToTensor(cv::Mat &img) {
         cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
-        at::Tensor tensor = torch::from_blob(img.data, {batch_size, img.rows, img.cols, 3});
-        tensor = tensor.permute({0, 3, 1, 2}) / 255.;
-        return tensor;
-    }
-
-    torch::Tensor ToTensor(const cv::Mat &img) {
-        cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
+        img.convertTo(img, CV_32FC3, 1.0f / 255.0f);
         at::Tensor tensor = torch::from_blob(img.data, {img.rows, img.cols, 3});
-        tensor = tensor.permute({2, 0, 1}) / 255.;
+        tensor = tensor.permute({2, 0, 1});
         return tensor;
     }
 
@@ -35,11 +29,26 @@ namespace Transform {
         return roi_img;
     }
 
+//    cv::Mat Resize(cv::Mat img, int size) {
+//        int w = img.cols, h = img.rows;
+//        if ((w <= h and w == size) or (h <= w and h == size)) {
+//            return img;
+//        } else {
+//            int ow, oh;
+//            if (w < h) {
+//                ow = size;
+//                oh = int(size * h / w);
+//            } else {
+//                oh = size;
+//                ow = int(size * w / h);
+//            }
+//            cv::resize(img, img, cv::Size(ow, oh));
+//            return img;
+//        }
+//    }
     cv::Mat Resize(cv::Mat img, int size) {
         int w = img.cols, h = img.rows;
-        if ((w <= h and w == size) or (h <= w and h == size)) {
-            return img;
-        } else {
+        if (!((w <= h and w == size) or (h <= w and h == size))) {
             int ow, oh;
             if (w < h) {
                 ow = size;
@@ -49,8 +58,8 @@ namespace Transform {
                 ow = int(size * w / h);
             }
             cv::resize(img, img, cv::Size(ow, oh));
-            return img;
         }
+        return img;
     }
 
     torch::Tensor transOneImage(cv::Mat img, int size = 224, float ratio = 0.875) {
