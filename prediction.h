@@ -13,9 +13,9 @@
 class FeatureGenerator {
 public:
 
-    std::string paramPath = "";
+//    std::string paramPath = "";
 
-    explicit FeatureGenerator(std::string paramPath);
+    explicit FeatureGenerator(const std::string &paramPath);
 
     std::vector<float> flattenPredict(const torch::Tensor &batchOutput);
 
@@ -23,10 +23,15 @@ public:
 
     torch::Tensor predict(const torch::Tensor &input);
 
-    int initModel();
+    int getModelStatus();
+
+    c10::ClassTypePtr getModelType();
 
     ~FeatureGenerator();
 
 private:
+    int modelStatus;
+    int embeddingSize;
+    std::string modelType;
     torch::jit::script::Module model;
 };

@@ -29,21 +29,27 @@ torch::Tensor FeatureGenerator::predict(const torch::Tensor &input) {
     return output;
 }
 
-FeatureGenerator::FeatureGenerator(std::string paramPath) {
-    this->paramPath = std::move(paramPath);
+FeatureGenerator::FeatureGenerator(const std::string &paramPath) {
+    try {
+        this->model = torch::jit::load(paramPath);
+    }
+    catch (const c10::Error &e) {
+        std::cerr << "error loading the module\n";
+        this->modelStatus = -1;
+    }
+
+    this->modelStatus = 0;
+
 }
 
 
 FeatureGenerator::~FeatureGenerator() = default;
 
-int FeatureGenerator::initModel() {
-    try {
-        this->model = torch::jit::load(this->paramPath);
-    }
-    catch (const c10::Error &e) {
-        std::cerr << "error loading the module\n";
-        return -1;
-    }
-    return 0;
+int FeatureGenerator::getModelStatus() {
+    return this->modelStatus;
+}
+
+c10::ClassTypePtr FeatureGenerator::getModelType() {
+    return model.type();
 }
 
