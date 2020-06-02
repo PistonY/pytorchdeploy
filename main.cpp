@@ -9,7 +9,7 @@ float vectorSimilarity(std::vector<T> m1, std::vector<T> m2) {
         return -1;
     }
     float sum = 0;
-    for (auto i = 0; i < length; ++i) {
+    for (unsigned long i = 0; i < length; ++i) {
         sum += m1[i] * m2[i];
     }
     return sum;
