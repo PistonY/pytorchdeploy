@@ -17,9 +17,11 @@ public:
 
     explicit FeatureGenerator(std::string paramPath);
 
-    std::vector<float> flattenPredict(const torch::Tensor& batchOutput);
+    std::vector<float> flattenPredict(const torch::Tensor &batchOutput);
 
-    std::vector<std::vector<float>> batchPredict(const torch::Tensor& batchOutput);
+    std::vector<std::vector<float>> batchPredict(const torch::Tensor &batchOutput);
+
+    torch::Tensor predict(const torch::Tensor &input);
 
     int initModel();
 
@@ -27,6 +29,4 @@ public:
 
 private:
     torch::jit::script::Module model;
-
-    torch::Tensor predict(const torch::Tensor& input);
 };

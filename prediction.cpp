@@ -4,14 +4,14 @@
 
 #include "prediction.h"
 
-std::vector<float> FeatureGenerator::flattenPredict(const torch::Tensor& batchInput) {
+std::vector<float> FeatureGenerator::flattenPredict(const torch::Tensor &batchInput) {
     auto batchOutput = this->predict(batchInput);
     std::vector<float> flattenFeats(
             batchOutput.data_ptr<float>(), batchOutput.data_ptr<float>() + batchOutput.numel());
     return flattenFeats;
 }
 
-std::vector<std::vector<float>> FeatureGenerator::batchPredict(const torch::Tensor& batchInput) {
+std::vector<std::vector<float>> FeatureGenerator::batchPredict(const torch::Tensor &batchInput) {
     auto batchOutput = this->predict(batchInput);
     std::vector<std::vector<float>> batchFeats;
     for (int i = 0; i < batchOutput.size(0); ++i) {
@@ -22,7 +22,7 @@ std::vector<std::vector<float>> FeatureGenerator::batchPredict(const torch::Tens
     return batchFeats;
 }
 
-torch::Tensor FeatureGenerator::predict(const torch::Tensor& input) {
+torch::Tensor FeatureGenerator::predict(const torch::Tensor &input) {
     std::vector<torch::jit::IValue> inputs;
     inputs.emplace_back(input.cuda());
     at::Tensor output = model.forward(inputs).toTensor().to(torch::kCPU, true);
