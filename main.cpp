@@ -23,15 +23,18 @@ int main(int argc, const char *argv[]) {
 //    Init model.
     auto *fg = new FeatureGenerator(argv[1]);
     int status = fg->getModelStatus();
-    std::cout << status << '\n';
-//    auto inp = torch::randn({2, 3, 224, 224}).cuda().toType(torch::kHalf);
-//    auto fp = fg->flattenPredict(inp);
-//    auto bp = fg->batchPredict(inp);
-//    std::cout << fp.capacity() << '\n';
+    int embs = fg->getEmbeddingSize();
+
+    std::cout << "status:" << status << " EmbeddingSize:"<< embs << '\n';
+
+    auto inp = torch::randn({2, 3, 224, 224}).cuda();
+    auto fp = fg->flattenPredict(inp);
+    auto bp = fg->batchPredict(inp);
+    std::cout << fp.capacity() << '\n';
 
 // process images and stack to one tensor
     auto img1 = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/0/0.jpg");
-    auto img2 = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/0/0.jpg");
+    auto img2 = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/0/1.jpg");
     auto trans_img1 = Transform::transOneImage(img1);
     auto trans_img2 = Transform::transOneImage(img2);
 
@@ -45,8 +48,7 @@ int main(int argc, const char *argv[]) {
     auto ten_out = fg->predict(sk_img).cuda();
     std::cout << torch::sum(torch::mul(ten_out.index({0}), ten_out.index({1}))) << std::endl;
 
-    std::cout << *fg->getModelType() << std::endl;
-    auto bp = fg->batchPredict(sk_img);
+    bp = fg->batchPredict(sk_img);
     std::cout << vectorSimilarity(bp[0], bp[1]) << "\n";
     return 0;
 

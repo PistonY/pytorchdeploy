@@ -15,7 +15,8 @@ namespace Transform {
     torch::Tensor ToTensor(cv::Mat &img) {
         cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
         img.convertTo(img, CV_32FC3, 1.0f / 255.0f);
-        at::Tensor tensor = torch::from_blob(img.data, {img.rows, img.cols, 3});
+        at::Tensor tensor = torch::from_blob(img.data, {img.rows, img.cols, 3},
+                                             torch::TensorOptions().requires_grad(false));
         tensor = tensor.permute({2, 0, 1});
         return tensor;
     }

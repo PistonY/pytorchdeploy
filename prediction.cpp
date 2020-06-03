@@ -32,14 +32,15 @@ torch::Tensor FeatureGenerator::predict(const torch::Tensor &input) {
 FeatureGenerator::FeatureGenerator(const std::string &paramPath) {
     try {
         this->model = torch::jit::load(paramPath);
+        this->model.eval();
     }
     catch (const c10::Error &e) {
         std::cerr << "error loading the module\n";
         this->modelStatus = -1;
     }
-
     this->modelStatus = 0;
-
+    auto inp = torch::randn({1, 3, 224, 224}).cuda();
+    this->embeddingSize = this->predict(inp).size(1);
 }
 
 
@@ -49,7 +50,7 @@ int FeatureGenerator::getModelStatus() {
     return this->modelStatus;
 }
 
-c10::ClassTypePtr FeatureGenerator::getModelType() {
-    return model.type();
+int FeatureGenerator::getEmbeddingSize() {
+    return this->embeddingSize;
 }
 
