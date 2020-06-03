@@ -30,23 +30,6 @@ namespace Transform {
         return roi_img;
     }
 
-//    cv::Mat Resize(cv::Mat img, int size) {
-//        int w = img.cols, h = img.rows;
-//        if ((w <= h and w == size) or (h <= w and h == size)) {
-//            return img;
-//        } else {
-//            int ow, oh;
-//            if (w < h) {
-//                ow = size;
-//                oh = int(size * h / w);
-//            } else {
-//                oh = size;
-//                ow = int(size * w / h);
-//            }
-//            cv::resize(img, img, cv::Size(ow, oh));
-//            return img;
-//        }
-//    }
     cv::Mat Resize(cv::Mat img, int size) {
         int w = img.cols, h = img.rows;
         if (!((w <= h and w == size) or (h <= w and h == size))) {

@@ -25,7 +25,7 @@ int main(int argc, const char *argv[]) {
     int status = fg->getModelStatus();
     int embs = fg->getEmbeddingSize();
 
-    std::cout << "status:" << status << " EmbeddingSize:"<< embs << '\n';
+    std::cout << "status:" << status << " EmbeddingSize:" << embs << '\n';
 
     auto inp = torch::randn({2, 3, 224, 224}).cuda();
     auto fp = fg->flattenPredict(inp);
