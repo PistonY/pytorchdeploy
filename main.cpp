@@ -47,13 +47,14 @@ int main(int argc, const char *argv[]) {
     stc.push_back(trans_img1);
     stc.push_back(trans_img2);
 
-    auto sk_img = torch::stack(stc);
-    std::cout << stc.size() << std::endl;
-//    auto ten_out = fg->predict(sk_img).cuda();
-//    std::cout << torch::sum(torch::mul(ten_out.index({0}), ten_out.index({1}))) << std::endl;
+    at::TensorList tl(stc);
+    auto sk_img = torch::stack(tl);
 
-//    bp = fg->batchPredict(sk_img);
-//    std::cout << vectorSimilarity(bp[0], bp[1]) << "\n";
+    auto ten_out = fg->predict(sk_img).cuda();
+    std::cout << torch::sum(torch::mul(ten_out.index({0}), ten_out.index({1}))) << std::endl;
+
+    auto bp = fg->batchPredict(sk_img);
+    std::cout << vectorSimilarity(bp[0], bp[1]) << "\n";
     return 0;
 
 }
