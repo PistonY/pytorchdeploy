@@ -27,14 +27,17 @@ int main(int argc, const char *argv[]) {
 
     std::cout << "status:" << status << " EmbeddingSize:" << embs << '\n';
 
-    auto inp = torch::randn({2, 3, 224, 224}).cuda();
-    auto fp = fg->flattenPredict(inp);
-    auto bp = fg->batchPredict(inp);
-    std::cout << fp.capacity() << '\n';
+//    auto inp = torch::randn({2, 3, 224, 224}).cuda();
+//    auto fp = fg->flattenPredict(inp);
+//    auto bp = fg->batchPredict(inp);
+//    std::cout << fp.capacity() << '\n';
 
 // process images and stack to one tensor
+
     auto img1 = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/0/0.jpg");
     auto img2 = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/0/1.jpg");
+
+
     auto trans_img1 = Transform::transOneImage(img1);
     auto trans_img2 = Transform::transOneImage(img2);
 
@@ -45,11 +48,12 @@ int main(int argc, const char *argv[]) {
     stc.push_back(trans_img2);
 
     auto sk_img = torch::stack(stc);
-    auto ten_out = fg->predict(sk_img).cuda();
-    std::cout << torch::sum(torch::mul(ten_out.index({0}), ten_out.index({1}))) << std::endl;
+    std::cout << stc.size() << std::endl;
+//    auto ten_out = fg->predict(sk_img).cuda();
+//    std::cout << torch::sum(torch::mul(ten_out.index({0}), ten_out.index({1}))) << std::endl;
 
-    bp = fg->batchPredict(sk_img);
-    std::cout << vectorSimilarity(bp[0], bp[1]) << "\n";
+//    bp = fg->batchPredict(sk_img);
+//    std::cout << vectorSimilarity(bp[0], bp[1]) << "\n";
     return 0;
 
 }

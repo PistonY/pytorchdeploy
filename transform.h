@@ -3,15 +3,10 @@
 //
 #include <torch/torch.h>
 #include <opencv2/opencv.hpp>
+#include <utility>
 
 
 namespace Transform {
-    // Rect(left, top, w, h)
-    cv::Mat Crop(const cv::Mat &img, const cv::Rect &rect) {
-        cv::Mat roi_img = img(rect);
-        return roi_img;
-    }
-
     torch::Tensor ToTensor(cv::Mat &img) {
         cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
         img.convertTo(img, CV_32FC3, 1.0f / 255.0f);
@@ -19,6 +14,12 @@ namespace Transform {
                                              torch::TensorOptions().requires_grad(false));
         tensor = tensor.permute({2, 0, 1});
         return tensor;
+    }
+
+    // Rect(left, top, w, h)
+    cv::Mat Crop(const cv::Mat &img, const cv::Rect &rect) {
+        cv::Mat roi_img = img(rect);
+        return roi_img;
     }
 
     cv::Mat CenterCrop(const cv::Mat &img, int size) {
@@ -46,8 +47,8 @@ namespace Transform {
         return img;
     }
 
-    torch::Tensor transOneImage(cv::Mat img, int size = 224, float ratio = 0.875) {
-        auto resized_img = Resize(std::move(img), int(float(size) / ratio));
+    torch::Tensor transOneImage(cv::Mat &img, int size = 224, float ratio = 0.875) {
+        auto resized_img = Resize(img, int(float(size) / ratio));
         auto cropped_img = CenterCrop(resized_img, size);
         auto tensor_img = ToTensor(cropped_img);
         return tensor_img.to(torch::kCUDA);
