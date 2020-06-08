@@ -24,8 +24,8 @@ std::vector<std::vector<float>> FeatureGenerator::batchPredict(const torch::Tens
 
 torch::Tensor FeatureGenerator::predict(const torch::Tensor &input) {
     std::vector<torch::jit::IValue> inputs;
-    inputs.emplace_back(input.cuda());
-    at::Tensor output = model.forward(inputs).toTensor().to(torch::kCPU, true);
+    inputs.emplace_back(input.cuda().to(torch::kHalf));
+    at::Tensor output = model.forward(inputs).toTensor().to(torch::kFloat).to(torch::kCPU, true);
     return output;
 }
 
@@ -39,7 +39,7 @@ FeatureGenerator::FeatureGenerator(const std::string &paramPath) {
         this->modelStatus = -1;
     }
     this->modelStatus = 0;
-    auto inp = torch::randn({1, 3, 224, 224}).cuda();
+    auto inp = torch::randn({1, 3, 224, 224});
     this->embeddingSize = this->predict(inp).size(1);
 }
 
