@@ -5,14 +5,9 @@
 #include <opencv2/opencv.hpp>
 #include <torch/script.h>
 
-#ifndef STUDY_PREDICTION_H
-#define STUDY_PREDICTION_H
-
-#endif //STUDY_PREDICTION_H
-
 class FeatureGenerator {
 public:
-    explicit FeatureGenerator(const std::string &paramPath);
+    explicit FeatureGenerator(const std::string &paramPath, int gpu = 0);
 
     std::vector<float> flattenPredict(const torch::Tensor &batchOutput);
 
@@ -29,5 +24,6 @@ public:
 private:
     int modelStatus;
     int embeddingSize;
+    std::string device;
     torch::jit::script::Module model;
 };

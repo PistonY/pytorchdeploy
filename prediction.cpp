@@ -24,14 +24,15 @@ std::vector<std::vector<float>> FeatureGenerator::batchPredict(const torch::Tens
 
 torch::Tensor FeatureGenerator::predict(const torch::Tensor &input) {
     std::vector<torch::jit::IValue> inputs;
-    inputs.emplace_back(input.cuda().to(torch::kHalf));
-    at::Tensor output = model.forward(inputs).toTensor().to(torch::kFloat).to(torch::kCPU, true);
+    inputs.emplace_back(input.to(this->device, torch::kHalf, true));
+    at::Tensor output = model.forward(inputs).toTensor().to(torch::kCPU, torch::kFloat, true);
     return output;
 }
 
-FeatureGenerator::FeatureGenerator(const std::string &paramPath) {
+FeatureGenerator::FeatureGenerator(const std::string &paramPath, int gpu) {
+    this->device = std::string("cuda:").append(std::to_string(gpu));
     try {
-        this->model = torch::jit::load(paramPath);
+        this->model = torch::jit::load(paramPath, c10::Device(this->device));
         this->model.eval();
     }
     catch (const c10::Error &e) {
@@ -43,7 +44,6 @@ FeatureGenerator::FeatureGenerator(const std::string &paramPath) {
     this->embeddingSize = this->predict(inp).size(1);
 }
 
-
 FeatureGenerator::~FeatureGenerator() = default;
 
 int FeatureGenerator::getModelStatus() {
@@ -53,4 +53,5 @@ int FeatureGenerator::getModelStatus() {
 int FeatureGenerator::getEmbeddingSize() {
     return this->embeddingSize;
 }
+
 

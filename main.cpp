@@ -15,25 +15,6 @@ float vectorSimilarity(std::vector<T> m1, std::vector<T> m2) {
     return sum;
 }
 
-void test(std::string &paramPath, int batchSize = 64, int testLoop = 10000) {
-    auto *fg = new FeatureGenerator(paramPath);
-    int status = fg->getModelStatus();
-    int embs = fg->getEmbeddingSize();
-
-    std::cout << "status:" << status << " EmbeddingSize:" << embs << '\n';
-    for (int i = 0; i < testLoop; ++i) {
-        std::vector<at::Tensor> stc;
-        for (int j = 0; j < batchSize; ++j) {
-            auto img = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/0/0.jpg");
-            auto trans_img = Transform::transOneImage(img);
-            stc.push_back(trans_img);
-        }
-        at::TensorList tl(stc);
-        auto sk_img = torch::stack(tl);
-        auto ten_out = fg->batchPredict(sk_img);
-        std::cout << i << std::endl;
-    }
-}
 
 int main(int argc, const char *argv[]) {
     if (argc != 2) {
@@ -41,7 +22,10 @@ int main(int argc, const char *argv[]) {
         return -1;
     }
 //    Init model.
-    auto *fg = new FeatureGenerator(argv[1]);
+//    cudaSetDevice(1);
+    cv::cuda::setDevice(1);
+    int gpu = 1;
+    auto *fg = new FeatureGenerator(argv[1], gpu);
     int status = fg->getModelStatus();
     int embs = fg->getEmbeddingSize();
 
@@ -56,26 +40,30 @@ int main(int argc, const char *argv[]) {
 
 // process images and stack to one tensor
 
-    auto img1 = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/0/0.jpg");
-    auto img2 = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/0/1.jpg");
+    auto img1 = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/32/0.jpg");
+    auto img2 = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/32/1.jpg");
 
-    auto trans_img1 = Transform::transOneImage(img1);
-    auto trans_img2 = Transform::transOneImage(img2);
 
-    std::cout << trans_img1.dtype() << '\n';
+    auto gImg1 = cv::cuda::GpuMat(img1);
+    auto gImg2 = cv::cuda::GpuMat(img2);
+
+
+    auto trans_img1 = Transform::transOneImage(gImg1, gpu);
+    auto trans_img2 = Transform::transOneImage(gImg2, gpu);
+
+    std::cout << trans_img1.index({0, 0, "..."}).slice(/*dim=*/0, /*start=*/0, /*end=*/10) << '\n';
 
     std::vector<at::Tensor> stc;
     stc.push_back(trans_img1);
     stc.push_back(trans_img2);
+    auto sk_img = torch::stack(stc);
+    std::cout << sk_img.index({0, 0, 0, "..."}).slice(/*dim=*/0, /*start=*/0, /*end=*/10) << '\n';
 
-    at::TensorList tl(stc);
-    auto sk_img = torch::stack(tl);
+    auto ten_out = fg->predict(sk_img);
 
-    auto ten_out = fg->predict(sk_img).cuda();
     std::cout << torch::sum(torch::mul(ten_out.index({0}), ten_out.index({1}))) << std::endl;
 
     bp = fg->batchPredict(sk_img);
     std::cout << vectorSimilarity(bp[0], bp[1]) << "\n";
     return 0;
-
 }
