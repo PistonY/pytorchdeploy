@@ -17,7 +17,7 @@ float vectorSimilarity(std::vector<T> m1, std::vector<T> m2) {
 
 
 int main(int argc, const char *argv[]) {
-    if (argc != 2) {
+    if (argc != 4) {
         std::cerr << "usage: example-app <path-to-exported-script-module>\n";
         return -1;
     }
@@ -37,12 +37,12 @@ int main(int argc, const char *argv[]) {
     auto bp = fg->batchPredict(inp);
     std::cout << fp.capacity() << '\n';
 
-
 // process images and stack to one tensor
 
-    auto img1 = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/32/0.jpg");
-    auto img2 = cv::imread("/media/piston/data/AQIYI_VIDEO_DNA/val_new/32/1.jpg");
-
+    auto img1 = cv::imread(argv[2]);
+    auto img2 = cv::imread(argv[3]);
+    std::cout << img1.size << std::endl;
+    std::cout << img2.size << std::endl;
 
     auto gImg1 = cv::cuda::GpuMat(img1);
     auto gImg2 = cv::cuda::GpuMat(img2);

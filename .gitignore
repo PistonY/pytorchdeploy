@@ -1,2 +1,10 @@
 ./libtorch
 ./cmake-build-debug
+/Docker/v1.0/opencv-4.3.0.zip
+/Docker/opencv_contrib-4.3.0.tar.gz
+/Docker/v1.0/Video_Codec_SDK_9.1.23.zip
+/Docker/v1.0/sources.list
+/Docker/v1.0/opencv_contrib-4.3.0.zip
+/Docker/v1.1/cmake-3.17.3.tar.gz
+/Docker/v1.1/libtorch-cxx11-abi-shared-with-deps-1.5.0.zip
+/model/
