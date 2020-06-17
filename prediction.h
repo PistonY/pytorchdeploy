@@ -1,6 +1,9 @@
 //
 // Created by piston on 2020/5/21.
 //
+#ifndef PREDICTION_H
+#define PREDICTION_H
+
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <torch/script.h>
@@ -27,3 +30,5 @@ private:
     std::string device;
     torch::jit::script::Module model;
 };
+
+#endif
