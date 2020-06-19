@@ -20,13 +20,10 @@ public:
 
     int getModelStatus();
 
-    int getEmbeddingSize();
-
     ~FeatureGenerator();
 
 private:
     int modelStatus;
-    int embeddingSize;
     std::string device;
     torch::jit::script::Module model;
 };

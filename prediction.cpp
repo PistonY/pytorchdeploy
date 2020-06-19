@@ -40,18 +40,12 @@ FeatureGenerator::FeatureGenerator(const std::string &paramPath, int gpu) {
         this->modelStatus = -1;
     }
     this->modelStatus = 0;
-    auto inp = torch::randn({1, 3, 224, 224});
-    this->embeddingSize = this->predict(inp).size(1);
 }
 
 FeatureGenerator::~FeatureGenerator() = default;
 
 int FeatureGenerator::getModelStatus() {
     return this->modelStatus;
-}
-
-int FeatureGenerator::getEmbeddingSize() {
-    return this->embeddingSize;
 }
 
 
