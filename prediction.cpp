@@ -34,12 +34,12 @@ FeatureGenerator::FeatureGenerator(const std::string &paramPath, int gpu) {
     try {
         this->model = torch::jit::load(paramPath, c10::Device(this->device));
         this->model.eval();
+        this->modelStatus = 0;
     }
     catch (const c10::Error &e) {
         std::cerr << "error loading the module\n";
         this->modelStatus = -1;
     }
-    this->modelStatus = 0;
 }
 
 FeatureGenerator::~FeatureGenerator() = default;
